@@ -1,6 +1,7 @@
 const Keyboard = {
     elements: {
         main: null,
+        input: null,
         keysContainer: null,
         keys: []
     },
@@ -16,6 +17,10 @@ const Keyboard = {
     },
 
     init() {
+        this.elements.input = document.createElement('textarea');
+        this.elements.input.classList.add('use-keyboard-input');
+        document.body.appendChild(this.elements.input);
+
         // Create main elements
         this.elements.main = document.createElement('div');
         this.elements.keysContainer = document.createElement('div');
@@ -82,7 +87,7 @@ const Keyboard = {
 
                     keyElement.addEventListener('click', () => {
                         this._toggleCapsLock();
-                        keyElement.classList.toggle('keyboard__key--activate', this.properties.capsLock);
+                        keyElement.classList.toggle('keyboard__key--active', this.properties.capsLock);
 
                     });
                     break;
@@ -165,9 +170,33 @@ const Keyboard = {
         this.eventHandlers.oninput = oninput;
         this.eventHandlers.onclose = onclose;
         this.elements.main.classList.add('keyboard--hidden');
+    },
+
+    keyOnDown(e) {
+        // e.key - нажатая кнопка (a,b,c, ...)
+        // keys - массив всех кнопок клавиатуры
+        let keys = document.querySelectorAll('.keyboard__key');
+
+        for (const key of keys) {
+            if (e.key == key.innerHTML) {
+                key.classList.toggle('active');
+            }
+        }
+    },
+
+    keyOnUp(e) {
+        let keys = document.querySelectorAll('.keyboard__key');
+
+        for (const key of keys) {
+            if (e.key == key.innerHTML) {
+                key.classList.toggle('active');
+            }
+        }
     }
 };
 
 window.addEventListener('DOMContentLoaded', function () {
     Keyboard.init();
+    document.addEventListener('keydown', Keyboard.keyOnDown);
+    document.addEventListener('keyup', Keyboard.keyOnUp);
 });
