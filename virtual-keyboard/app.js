@@ -50,12 +50,20 @@ const Keyboard = {
     _createKeys() {
         const fragment = document.createDocumentFragment();
         const keyLayout = [
-            "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "backspace",
-            "q", "w", "e", "r", "t", "y", "u", "i", "o", "p",
-            "caps", "a", "s", "d", "f", "g", "h", "j", "k", "l", "enter",
-            "done", "z", "x", "c", "v", "b", "n", "m", ",", ".", "?",
-            "space"
+            "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "backspace",
+            "tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\",
+            "caps", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "enter",
+            "shift", "z", "x", "c", "v", "b", "n", "m", ",", ".", "?", "up", "done",
+            "ctrl", "ru/en", "alt", "space", "alt", "left", "down", "right"
         ];
+
+        // const keyLayout = [
+        //     "ё", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "backspace",
+        //     "tab", "й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ", "\\",
+        //     "caps", "ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э", "enter",
+        //     "shift", "я", "ч", "с", "м", "и", "т", "ь", "б", "ю", ".","up", "done",
+        //     "ctrl", "ru/en", "alt", "space", "alt", "left", "down", "right"
+        // ];
 
         // Create HTML for an icon
         const createIconHTML = (icon_name) => {
@@ -64,7 +72,6 @@ const Keyboard = {
 
         keyLayout.forEach(key => {
             const keyElement = document.createElement('button');
-            const insertLineBreak = ['backspace', 'p', 'enter', '?'].indexOf(key) !== -1;
 
             // Add attributes/classes
             keyElement.setAttribute('type', 'button');
@@ -72,7 +79,7 @@ const Keyboard = {
 
             switch (key) {
                 case 'backspace':
-                    keyElement.classList.add('keyboard__key--wide');
+                    keyElement.classList.add('keyboard__key--tab');
                     keyElement.innerHTML = createIconHTML('backspace');
 
                     keyElement.addEventListener('click', () => {
@@ -113,7 +120,7 @@ const Keyboard = {
                     break;
 
                 case 'done':
-                    keyElement.classList.add('keyboard__key--wide', 'keyboard__key--dark');
+                    keyElement.classList.add('keyboard__key', 'keyboard__key--dark');
                     keyElement.innerHTML = createIconHTML('check_circle');
 
                     keyElement.addEventListener('click', () => {
@@ -122,8 +129,78 @@ const Keyboard = {
                     });
                     break;
 
+                case 'tab':
+                    keyElement.classList.add('keyboard__key--tab');
+                    keyElement.innerHTML = 'Tab';
+
+                    keyElement.addEventListener('click', () => {
+
+                        this._triggerEvent('onclose');
+                    });
+                    break;
+
+                case 'shift':
+                    keyElement.classList.add('keyboard__key--wider');
+                    keyElement.innerHTML = 'Shift';
+
+                    keyElement.addEventListener('click', () => {
+
+                        this._triggerEvent('onclose');
+                    });
+                    break;
+
+                case 'ru/en':
+                    keyElement.classList.add('keyboard__key');
+                    keyElement.innerHTML = 'RU/EN';
+
+                    keyElement.addEventListener('click', () => {
+
+                        this._triggerEvent('onclose');
+                    });
+                    break;
+
+                case 'up':
+                    keyElement.classList.add('keyboard__key');
+                    keyElement.innerHTML = createIconHTML('arrow_upward');
+
+                    keyElement.addEventListener('click', () => {
+
+                        this._triggerEvent('onclose');
+                    });
+                    break;
+
+                case 'down':
+                    keyElement.classList.add('keyboard__key');
+                    keyElement.innerHTML = createIconHTML('arrow_downward');
+
+                    keyElement.addEventListener('click', () => {
+
+                        this._triggerEvent('onclose');
+                    });
+                    break;
+
+                case 'left':
+                    keyElement.classList.add('keyboard__key');
+                    keyElement.innerHTML = createIconHTML('arrow_back');
+
+                    keyElement.addEventListener('click', () => {
+
+                        this._triggerEvent('onclose');
+                    });
+                    break;
+
+                case 'right':
+                    keyElement.classList.add('keyboard__key');
+                    keyElement.innerHTML = createIconHTML('arrow_forward');
+
+                    keyElement.addEventListener('click', () => {
+
+                        this._triggerEvent('onclose');
+                    });
+                    break;
+
                 default:
-                    keyElement.textContent = key.toLocaleLowerCase();
+                    keyElement.textContent = key.toLowerCase();
 
                     keyElement.addEventListener('click', () => {
                         this.properties.value += this.properties.capsLock ? key.toUpperCase() : key.toLowerCase();
@@ -134,9 +211,7 @@ const Keyboard = {
 
             fragment.appendChild(keyElement);
 
-            if (insertLineBreak) {
-                fragment.appendChild(document.createElement('br'));
-            }
+
         });
 
         return fragment;
@@ -175,11 +250,26 @@ const Keyboard = {
     keyOnDown(e) {
         // e.key - нажатая кнопка (a,b,c, ...)
         // keys - массив всех кнопок клавиатуры
+        console.log(e.key)
         let keys = document.querySelectorAll('.keyboard__key');
 
         for (const key of keys) {
             if (e.key == key.innerHTML) {
-                key.classList.toggle('active');
+                key.classList.add('active');
+            }
+            else if (e.key == 'Backspace' && key.innerText == 'backspace') {
+                key.classList.add('active');
+            }
+            else if (e.key == 'Enter' && key.innerText == 'keyboard_return') {
+                key.classList.add('active');
+            }
+            else if (e.key == 'CapsLock' && key.innerText == 'keyboard_capslock') {
+                key.classList.add('active');
+                key.classList.add('keyboard__key--active');
+                Keyboard._toggleCapsLock();
+            }
+            else if (e.key == ' ' && key.innerText == 'space_bar') {
+                key.classList.add('active');
             }
         }
     },
@@ -189,9 +279,39 @@ const Keyboard = {
 
         for (const key of keys) {
             if (e.key == key.innerHTML) {
-                key.classList.toggle('active');
+                key.classList.remove('active');
+            }
+            else if (e.key == 'Backspace' && key.innerText == 'backspace') {
+                key.classList.remove('active');
+            }
+            else if (e.key == 'Enter' && key.innerText == 'keyboard_return') {
+                key.classList.remove('active');
+            }
+            else if (e.key == 'CapsLock' && key.innerText == 'keyboard_capslock') {
+                key.classList.remove('active');
+            }
+            else if (e.key == ' ' && key.innerText == 'space_bar') {
+                key.classList.remove('active');
             }
         }
+    },
+
+    changeLang(e) {
+        const keyLayoutRU = [
+            "ё", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "backspace",
+            "tab", "й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ", "\\",
+            "caps", "ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э", "enter",
+            "shift", "я", "ч", "с", "м", "и", "т", "ь", "б", "ю", ".", "up", "done",
+            "ctrl", "ru/en", "alt", "space", "alt", "left", "down", "right"
+        ];
+        const keyLayoutEN = [
+            "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "backspace",
+            "tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\",
+            "caps", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "enter",
+            "shift", "z", "x", "c", "v", "b", "n", "m", ",", ".", "?", "up", "done",
+            "ctrl", "ru/en", "alt", "space", "alt", "left", "down", "right"
+        ];
+        Keyboard._createKeys()
     }
 };
 
