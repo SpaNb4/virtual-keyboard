@@ -10,6 +10,7 @@ const Keyboard = {
         value: '',
         capsLock: false,
         shift: false,
+        notification: true,
     },
     isRU: true,
     // prettier-ignore
@@ -18,7 +19,7 @@ const Keyboard = {
         "tab", "й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ", "\\",
         "caps", "ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э", "enter",
         "shift", "я", "ч", "с", "м", "и", "т", "ь", "б", "ю", ".", "up", "done",
-        "ctrl", "ru/en", "alt", "space", "alt", "left", "down", "right"
+        "ctrl", "ru/en", "alt", "space", "notifications", "left", "down", "right"
     ],
     // prettier-ignore
     keyLayoutEN: [
@@ -26,7 +27,7 @@ const Keyboard = {
         "tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\",
         "caps", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "enter",
         "shift", "z", "x", "c", "v", "b", "n", "m", ",", ".", "?", "up", "done",
-        "ctrl", "ru/en", "alt", "space", "alt", "left", "down", "right"
+        "ctrl", "ru/en", "alt", "space", "notifications", "left", "down", "right"
     ],
     // prettier-ignore
     keyLayoutRUShift: [
@@ -34,7 +35,7 @@ const Keyboard = {
         "tab", "й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ", "\\",
         "caps", "ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э", "enter",
         "shift", "я", "ч", "с", "м", "и", "т", "ь", "б", "ю", ",", "up", "done",
-        "ctrl", "ru/en", "alt", "space", "alt", "left", "down", "right"
+        "ctrl", "ru/en", "alt", "space", "notifications", "left", "down", "right"
     ],
     // prettier-ignore
     keyLayoutENShift: [
@@ -42,7 +43,7 @@ const Keyboard = {
         "tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "{", "}", "/",
         "caps", "a", "s", "d", "f", "g", "h", "j", "k", "l", ":", '"', "enter",
         "shift", "z", "x", "c", "v", "b", "n", "m", "<", ">", "?", "up", "done",
-        "ctrl", "ru/en", "alt", "space", "alt", "left", "down", "right"
+        "ctrl", "ru/en", "alt", "space", "notifications", "left", "down", "right"
     ],
 
     init(keyLayout) {
@@ -96,7 +97,7 @@ const Keyboard = {
 
             switch (key) {
                 case 'backspace':
-                    keyElement.classList.add('keyboard__key--tab');
+                    keyElement.classList.add('keyboard__key--tab', 'backspace');
                     keyElement.innerHTML = createIconHTML('backspace');
 
                     keyElement.addEventListener('click', () => {
@@ -107,27 +108,30 @@ const Keyboard = {
                         }
                         input.value = this.properties.value;
                         input.focus();
+                        this.keySound('backspace');
                     });
                     break;
 
                 case 'caps':
-                    keyElement.classList.add('keyboard__key--wide', 'keyboard__key--activatable');
+                    keyElement.classList.add('keyboard__key--wide', 'keyboard__key--activatable', 'capslock');
                     keyElement.innerHTML = createIconHTML('keyboard_capslock');
 
                     keyElement.addEventListener('click', () => {
                         this.toggleCapsLock();
                         keyElement.classList.toggle('keyboard__key--active', this.properties.capsLock);
+                        this.keySound('capslock');
                     });
                     break;
 
                 case 'enter':
-                    keyElement.classList.add('keyboard__key--wide');
+                    keyElement.classList.add('keyboard__key--wide', 'enter');
                     keyElement.innerHTML = createIconHTML('keyboard_return');
 
                     keyElement.addEventListener('click', () => {
                         this.properties.value += '\n';
                         input.value = this.properties.value;
                         input.focus();
+                        this.keySound('enter');
                     });
                     break;
 
@@ -163,6 +167,7 @@ const Keyboard = {
                     keyElement.addEventListener('click', () => {
                         this.toggleShift();
                         keyElement.classList.toggle('keyboard__key--active', this.properties.shift);
+                        this.keySound('shift');
                     });
                     break;
 
@@ -217,6 +222,19 @@ const Keyboard = {
                     keyElement.addEventListener('click', () => {});
                     break;
 
+                case 'notifications':
+                    keyElement.classList.add('keyboard__key');
+                    keyElement.innerHTML = createIconHTML('notifications_active');
+                    keyElement.addEventListener('click', () => {
+                        this.properties.notification = !this.properties.notification;
+                        if (this.properties.notification) {
+                            keyElement.firstChild.innerHTML = 'notifications_active';
+                        } else {
+                            keyElement.firstChild.innerHTML = 'notifications_off';
+                        }
+                    });
+                    break;
+
                 default:
                     keyElement.textContent = key.toLowerCase();
 
@@ -229,6 +247,11 @@ const Keyboard = {
                             this.properties.value = this.properties.value.slice(0, pos) + key.toLowerCase() + this.properties.value.slice(pos);
                         }
                         input.value = this.properties.value;
+                        if (this.isRU) {
+                            this.keySound('defaultEN', '.keyboard__key');
+                        } else {
+                            this.keySound('defaultRU', '.keyboard__key');
+                        }
                     });
                     break;
             }
@@ -312,7 +335,6 @@ const Keyboard = {
                 input.focus();
 
                 let pos = input.selectionStart;
-                console.log(Keyboard.properties.value);
                 if (Keyboard.properties.capsLock) {
                     Keyboard.properties.value = Keyboard.properties.value.slice(0, pos) + e.key.toUpperCase() + Keyboard.properties.value.slice(pos);
                 } else {
@@ -360,6 +382,15 @@ const Keyboard = {
         } else {
             this.init(this.keyLayoutEN);
             this.isRU = !this.isRU;
+        }
+    },
+
+    keySound(audio_sel) {
+        if (this.properties.notification) {
+            const audio = document.querySelector(`audio[data-key="${audio_sel}"]`);
+
+            audio.currentTime = 0;
+            audio.play();
         }
     },
 };
