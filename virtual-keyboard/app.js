@@ -14,6 +14,8 @@ const Keyboard = {
         voice: false,
     },
     isRU: true,
+    selFrom: null,
+    selTo: null,
     // prettier-ignore
     keyLayoutRU: [
         "ё", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "backspace", 'line break',
@@ -78,12 +80,14 @@ const Keyboard = {
             this.open();
         });
 
-        let selFrom;
-        let selTo;
-        input.onselect = function () {
-            selFrom = input.selectionStart;
-            selTo = input.selectionEnd;
-        };
+        let prevFrom;
+        let prevTo;
+        let isPrev = true;
+        document.addEventListener('selectionchange', () => {
+            this.selFrom = input.selectionStart;
+            this.selTo = input.selectionEnd;
+        });
+
         // Create HTML for an icon
         const createIconHTML = (icon_name) => {
             return `<i class="material-icons">${icon_name}</i>`;
@@ -91,8 +95,6 @@ const Keyboard = {
         let line = document.createElement('div');
         line.classList.add('line');
         keyLayout.forEach((key) => {
-           
-           
             const keyElement = document.createElement('button');
             // Add attributes/classes
             keyElement.setAttribute('type', 'button');
@@ -104,20 +106,22 @@ const Keyboard = {
             } else {
                 line.appendChild(keyElement);
             }
-           
+
             switch (key) {
                 case 'backspace':
                     keyElement.classList.add('keyboard__key--tab', 'backspace');
                     keyElement.innerHTML = createIconHTML('backspace');
 
                     keyElement.addEventListener('click', () => {
-                        if (selFrom && selTo) {
-                            this.properties.value = this.properties.value.replace(this.properties.value.substring(selFrom, selTo), '');
+                        if (this.selFrom != this.selTo) {
+                            this.properties.value = this.properties.value.replace(this.properties.value.substring(this.selFrom, this.selTo), '');
                         } else {
-                            this.properties.value = this.properties.value.substring(0, this.properties.value.length - 1);
+                            this.properties.value = this.properties.value.substring(0, this.selFrom - 1) + this.properties.value.substring(this.selFrom, this.properties.value.length);
                         }
                         input.value = this.properties.value;
                         input.focus();
+                        input.selectionStart=this.selFrom-1;
+                        input.selectionEnd=this.selTo-1;
                         this.keySound('backspace');
                     });
                     break;
@@ -222,14 +226,21 @@ const Keyboard = {
                     keyElement.classList.add('keyboard__key');
                     keyElement.innerHTML = createIconHTML('arrow_back');
 
-                    keyElement.addEventListener('click', () => {});
+                    keyElement.addEventListener('click', () => {
+                        input.focus();
+                        input.selectionStart -= 1;
+                        input.selectionEnd -= 1;
+                    });
                     break;
 
                 case 'right':
                     keyElement.classList.add('keyboard__key');
                     keyElement.innerHTML = createIconHTML('arrow_forward');
 
-                    keyElement.addEventListener('click', () => {});
+                    keyElement.addEventListener('click', () => {
+                        input.focus();
+                        input.selectionStart += 1;
+                    });
                     break;
 
                 case 'notifications':
@@ -264,11 +275,10 @@ const Keyboard = {
 
                     keyElement.addEventListener('click', () => {
                         input.focus();
-                        let pos = input.selectionStart;
                         if (this.properties.capsLock || this.properties.shift) {
-                            Keyboard.properties.value = this.properties.value.slice(0, pos) + key.toUpperCase() + this.properties.value.slice(pos);
+                            Keyboard.properties.value = this.properties.value.slice(0, this.selFrom) + key.toUpperCase() + this.properties.value.slice(this.selFrom);
                         } else {
-                            this.properties.value = this.properties.value.slice(0, pos) + key.toLowerCase() + this.properties.value.slice(pos);
+                            this.properties.value = this.properties.value.slice(0, this.selFrom) + key.toLowerCase() + this.properties.value.slice(this.selFrom);
                         }
                         input.value = this.properties.value;
                         if (this.isRU) {
@@ -276,6 +286,8 @@ const Keyboard = {
                         } else {
                             this.keySound('defaultRU', '.keyboard__key');
                         }
+                        input.selectionStart=this.selFrom+1;
+                        input.selectionEnd=this.selTo+1;
                     });
                     break;
             }
