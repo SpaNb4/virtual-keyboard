@@ -11,39 +11,40 @@ const Keyboard = {
         capsLock: false,
         shift: false,
         notification: true,
+        voice: false,
     },
     isRU: true,
     // prettier-ignore
     keyLayoutRU: [
-        "ё", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "backspace",
-        "tab", "й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ", "\\",
-        "caps", "ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э", "enter",
-        "shift", "я", "ч", "с", "м", "и", "т", "ь", "б", "ю", ".", "up", "done",
-        "ctrl", "ru/en", "alt", "space", "notifications", "left", "down", "right"
+        "ё", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "backspace", 'line break',
+        "tab", "й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ", "\\", 'line break',
+        "caps", "ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э", "enter", 'line break',
+        "shift", "я", "ч", "с", "м", "и", "т", "ь", "б", "ю", ".", "up", "keyboard_hide", 'line break',
+        "ctrl", "ru/en", "voice_over", "space", "notifications", "left", "down", "right"
     ],
     // prettier-ignore
     keyLayoutEN: [
-        "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "backspace",
-        "tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\",
-        "caps", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "enter",
-        "shift", "z", "x", "c", "v", "b", "n", "m", ",", ".", "?", "up", "done",
-        "ctrl", "ru/en", "alt", "space", "notifications", "left", "down", "right"
+        "`", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "=", "backspace", 'line break',
+        "tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "[", "]", "\\", 'line break',
+        "caps", "a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'", "enter", 'line break',
+        "shift", "z", "x", "c", "v", "b", "n", "m", ",", ".", "?", "up", "keyboard_hide", 'line break',
+        "ctrl", "ru/en", "voice_over", "space", "notifications", "left", "down", "right"
     ],
     // prettier-ignore
     keyLayoutRUShift: [
-        "Ё", "!", "\"", "№", ";", "%", ":", "?", "*", "(", ")", "+", "/", "backspace",
-        "tab", "й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ", "\\",
-        "caps", "ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э", "enter",
-        "shift", "я", "ч", "с", "м", "и", "т", "ь", "б", "ю", ",", "up", "done",
-        "ctrl", "ru/en", "alt", "space", "notifications", "left", "down", "right"
+        "Ё", "!", "\"", "№", ";", "%", ":", "?", "*", "(", ")", "+", "/", "backspace", 'line break',
+        "tab", "й", "ц", "у", "к", "е", "н", "г", "ш", "щ", "з", "х", "ъ", "\\", 'line break',
+        "caps", "ф", "ы", "в", "а", "п", "р", "о", "л", "д", "ж", "э", "enter", 'line break',
+        "shift", "я", "ч", "с", "м", "и", "т", "ь", "б", "ю", ",", "up", "keyboard_hide", 'line break',
+        "ctrl", "ru/en", "voice_over", "space", "notifications", "left", "down", "right"
     ],
     // prettier-ignore
     keyLayoutENShift: [
-        "~", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+", "backspace",
-        "tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "{", "}", "/",
-        "caps", "a", "s", "d", "f", "g", "h", "j", "k", "l", ":", '"', "enter",
-        "shift", "z", "x", "c", "v", "b", "n", "m", "<", ">", "?", "up", "done",
-        "ctrl", "ru/en", "alt", "space", "notifications", "left", "down", "right"
+        "~", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+", "backspace", 'line break',
+        "tab", "q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "{", "}", "/", 'line break',
+        "caps", "a", "s", "d", "f", "g", "h", "j", "k", "l", ":", '"', "enter", 'line break',
+        "shift", "z", "x", "c", "v", "b", "n", "m", "<", ">", "?", "up", "keyboard_hide", 'line break',
+        "ctrl", "ru/en", "voice_over", "space", "notifications", "left", "down", "right"
     ],
 
     init(keyLayout) {
@@ -87,14 +88,23 @@ const Keyboard = {
         const createIconHTML = (icon_name) => {
             return `<i class="material-icons">${icon_name}</i>`;
         };
-
+        let line = document.createElement('div');
+        line.classList.add('line');
         keyLayout.forEach((key) => {
+           
+           
             const keyElement = document.createElement('button');
-
             // Add attributes/classes
             keyElement.setAttribute('type', 'button');
             keyElement.classList.add('keyboard__key');
 
+            if (key == 'line break') {
+                line = document.createElement('div');
+                line.classList.add('line');
+            } else {
+                line.appendChild(keyElement);
+            }
+           
             switch (key) {
                 case 'backspace':
                     keyElement.classList.add('keyboard__key--tab', 'backspace');
@@ -144,9 +154,9 @@ const Keyboard = {
                     });
                     break;
 
-                case 'done':
+                case 'keyboard_hide':
                     keyElement.classList.add('keyboard__key', 'keyboard__key--dark');
-                    keyElement.innerHTML = createIconHTML('close');
+                    keyElement.innerHTML = createIconHTML('keyboard_hide');
 
                     keyElement.addEventListener('click', () => {
                         this.close();
@@ -235,6 +245,20 @@ const Keyboard = {
                     });
                     break;
 
+                case 'voice_over':
+                    keyElement.classList.add('keyboard__key');
+                    keyElement.innerHTML = createIconHTML('voice_over_off');
+                    keyElement.addEventListener('click', () => {
+                        this.properties.voice = !this.properties.voice;
+                        if (this.properties.voice) {
+                            keyElement.firstChild.innerHTML = 'record_voice_over';
+                        } else {
+                            keyElement.firstChild.innerHTML = 'voice_over_off';
+                        }
+                        this.voiceInput();
+                    });
+                    break;
+
                 default:
                     keyElement.textContent = key.toLowerCase();
 
@@ -256,9 +280,8 @@ const Keyboard = {
                     break;
             }
 
-            fragment.appendChild(keyElement);
+            fragment.appendChild(line);
         });
-
         return fragment;
     },
 
@@ -393,11 +416,39 @@ const Keyboard = {
             audio.play();
         }
     },
+
+    voiceInput() {
+        if (this.isRU) {
+            recognition.lang = 'en-US';
+        } else {
+            recognition.lang = 'ru-RU';
+        }
+        if (this.properties.voice) {
+            recognition.start();
+
+            recognition.addEventListener('result', function (e) {
+                let text = Array.from(e.results)
+                    .map((result) => result[0])
+                    .map((result) => result.transcript)
+                    .join('');
+
+                Keyboard.properties.value = text;
+            });
+
+            recognition.addEventListener('end', function (e) {
+                Keyboard.elements.input.value += Keyboard.properties.value;
+                recognition.start();
+            });
+        } else {
+            recognition.stop();
+        }
+    },
 };
 
 window.addEventListener('DOMContentLoaded', function () {
     Keyboard.init(Keyboard.keyLayoutEN);
 
-    document.addEventListener('keydown', Keyboard.keyOnDown);
+    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    (recognition = new SpeechRecognition()), document.addEventListener('keydown', Keyboard.keyOnDown);
     document.addEventListener('keyup', Keyboard.keyOnUp);
 });
