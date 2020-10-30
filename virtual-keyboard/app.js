@@ -115,15 +115,15 @@ const Keyboard = {
                     keyElement.addEventListener('click', () => {
                         if (this.selFrom != this.selTo) {
                             this.properties.value = this.properties.value.replace(this.properties.value.substring(this.selFrom, this.selTo), '');
-                            this.selFrom = this.properties.value.length + 1;
-                            this.selTo = this.properties.value.length + 1;
+                            input.value = this.properties.value;
+                            input.selectionStart = this.selFrom;
+                            input.selectionEnd = this.selFrom;
+                            input.focus();
                         } else {
                             this.properties.value = this.properties.value.substring(0, this.selFrom - 1) + this.properties.value.substring(this.selFrom, this.properties.value.length);
+                            input.value = this.properties.value;
+                            input.focus();
                         }
-                        input.value = this.properties.value;
-                        input.focus();
-                        input.selectionStart = this.selFrom - 1;
-                        input.selectionEnd = this.selTo - 1;
                         this.keySound('backspace');
                     });
                     break;
@@ -144,8 +144,14 @@ const Keyboard = {
                     keyElement.innerHTML = createIconHTML('keyboard_return');
 
                     keyElement.addEventListener('click', () => {
-                        this.properties.value += '\n';
+                        if (this.selFrom != this.selTo) {
+                            this.properties.value = this.properties.value.replace(this.properties.value.substring(this.selFrom, this.selTo), '\n');
+                        } else {
+                            this.properties.value = this.properties.value.substring(0, this.selFrom) + '\n' + this.properties.value.substring(this.selFrom, this.properties.value.length);
+                        }
                         input.value = this.properties.value;
+                        input.selectionStart = this.selFrom + 1;
+                        input.selectionEnd = this.selFrom + 1;
                         input.focus();
                         this.keySound('enter');
                     });
@@ -156,8 +162,14 @@ const Keyboard = {
                     keyElement.innerHTML = createIconHTML('space_bar');
 
                     keyElement.addEventListener('click', () => {
-                        this.properties.value += ' ';
+                        if (this.selFrom != this.selTo) {
+                            this.properties.value = this.properties.value.replace(this.properties.value.substring(this.selFrom, this.selTo), ' ');
+                        } else {
+                            this.properties.value = this.properties.value.substring(0, this.selFrom) + ' ' + this.properties.value.substring(this.selFrom, this.properties.value.length);
+                        }
                         input.value = this.properties.value;
+                        input.selectionStart = this.selFrom + 1;
+                        input.selectionEnd = this.selFrom + 1;
                         input.focus();
                     });
                     break;
@@ -281,7 +293,6 @@ const Keyboard = {
                             keyElement.firstChild.innerHTML = 'record_voice_over';
                         } else {
                             keyElement.firstChild.innerHTML = 'voice_over_off';
-                            recognition.removeEventListener('end', rec_end);
                             recognition.abort();
                         }
                         this.voiceInput();
@@ -292,26 +303,37 @@ const Keyboard = {
                     keyElement.textContent = key;
 
                     keyElement.addEventListener('click', () => {
-                        input.focus();
-                        if (this.properties.shift && this.properties.capsLock) {
-                            this.properties.value = this.properties.value.slice(0, this.selFrom) + key.toLowerCase() + this.properties.value.slice(this.selFrom);
-                        } else if (!this.properties.shift && this.properties.capsLock) {
-                            this.properties.value = this.properties.value.slice(0, this.selFrom) + key.toUpperCase() + this.properties.value.slice(this.selFrom);
-                        } else if (this.properties.shift && !this.properties.capsLock) {
-                            this.properties.value = this.properties.value.slice(0, this.selFrom) + key.toUpperCase() + this.properties.value.slice(this.selFrom);
-                        } else if (!this.properties.shift && !this.properties.capsLock) {
-                            this.properties.value = this.properties.value.slice(0, this.selFrom) + key.toLowerCase() + this.properties.value.slice(this.selFrom);
+                        if (this.selFrom != this.selTo) {
+                            if (this.properties.shift && this.properties.capsLock) {
+                                this.properties.value = this.properties.value.replace(this.properties.value.substring(this.selFrom, this.selTo), key.toLowerCase());
+                            } else if (!this.properties.shift && this.properties.capsLock) {
+                                this.properties.value = this.properties.value.replace(this.properties.value.substring(this.selFrom, this.selTo), key.toUpperCase());
+                            } else if (this.properties.shift && !this.properties.capsLock) {
+                                this.properties.value = this.properties.value.replace(this.properties.value.substring(this.selFrom, this.selTo), key.toUpperCase());
+                            } else if (!this.properties.shift && !this.properties.capsLock) {
+                                this.properties.value = this.properties.value.replace(this.properties.value.substring(this.selFrom, this.selTo), key.toLowerCase());
+                            }
+                        } else {
+                            if (this.properties.shift && this.properties.capsLock) {
+                                this.properties.value = this.properties.value.slice(0, this.selFrom) + key.toLowerCase() + this.properties.value.slice(this.selFrom);
+                            } else if (!this.properties.shift && this.properties.capsLock) {
+                                this.properties.value = this.properties.value.slice(0, this.selFrom) + key.toUpperCase() + this.properties.value.slice(this.selFrom);
+                            } else if (this.properties.shift && !this.properties.capsLock) {
+                                this.properties.value = this.properties.value.slice(0, this.selFrom) + key.toUpperCase() + this.properties.value.slice(this.selFrom);
+                            } else if (!this.properties.shift && !this.properties.capsLock) {
+                                this.properties.value = this.properties.value.slice(0, this.selFrom) + key.toLowerCase() + this.properties.value.slice(this.selFrom);
+                            }
                         }
-
                         input.value = this.properties.value;
+                        input.selectionStart = this.selFrom + 1;
+                        input.selectionEnd = this.selFrom + 1;
+                        input.focus();
+
                         if (this.isRU) {
                             this.keySound('defaultRU', '.keyboard__key');
                         } else {
                             this.keySound('defaultEN', '.keyboard__key');
                         }
-
-                        input.selectionStart = this.selFrom + 1;
-                        input.selectionEnd = this.selTo + 1;
                     });
                     break;
             }
@@ -477,6 +499,8 @@ const Keyboard = {
             recognition.lang = 'en-US';
         }
 
+        recognition.continuous = true;
+
         if (this.properties.voice) {
             recognition.start();
 
@@ -485,16 +509,10 @@ const Keyboard = {
                     .map((result) => result[0])
                     .map((result) => result.transcript)
                     .join('');
-
                 Keyboard.properties.value = text;
-                Keyboard.elements.input.value += Keyboard.properties.value;
+                Keyboard.elements.input.value = Keyboard.properties.value;
             });
-
-            recognition.addEventListener('end', function rec_end(e) {
-                recognition.start();
-            });
-        } 
-
+        }
     },
 };
 
