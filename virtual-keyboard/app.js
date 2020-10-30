@@ -122,6 +122,8 @@ const Keyboard = {
                         } else {
                             this.properties.value = this.properties.value.substring(0, this.selFrom - 1) + this.properties.value.substring(this.selFrom, this.properties.value.length);
                             input.value = this.properties.value;
+                            input.selectionStart = this.selFrom-1;
+                            input.selectionEnd = this.selFrom-1;
                             input.focus();
                         }
                         this.keySound('backspace');
@@ -348,6 +350,11 @@ const Keyboard = {
 
         this.caseOfLetters();
 
+        let input = document.querySelector('.use-keyboard-input');
+        input.selectionStart = this.selFrom;
+        input.selectionEnd = this.selTo;
+        input.focus();
+
         let shiftKey = document.querySelector('.shift');
         shiftKey.classList.toggle('keyboard__key--active', this.properties.shift);
 
@@ -396,6 +403,11 @@ const Keyboard = {
 
         this.caseOfLetters();
 
+        let input = document.querySelector('.use-keyboard-input');
+        input.selectionStart = this.selFrom;
+        input.selectionEnd = this.selTo;
+        input.focus();
+
         let shiftKey = document.querySelector('.shift');
         shiftKey.classList.add('active');
         shiftKey.classList.remove('active');
@@ -418,28 +430,20 @@ const Keyboard = {
         // e.key - нажатая кнопка (a,b,c, ...)
         // keys - массив всех кнопок клавиатуры
         let keys = document.querySelectorAll('.keyboard__key');
+        let input = document.querySelector('.use-keyboard-input');
 
         for (const key of keys) {
             if (e.key == key.innerHTML && e.key != 'Shift' && e.key != 'Tab') {
                 key.classList.add('active');
-                let input = document.querySelector('.use-keyboard-input');
                 input.focus();
-                if (Keyboard.properties.capsLock) {
-                    Keyboard.properties.value = Keyboard.properties.value.slice(0, Keyboard.selFrom) + e.key.toUpperCase() + Keyboard.properties.value.slice(Keyboard.selFrom);
-                } else {
-                    Keyboard.properties.value = Keyboard.properties.value.slice(0, Keyboard.selFrom) + e.key.toLowerCase() + Keyboard.properties.value.slice(Keyboard.selFrom);
-                }
             } else if (e.key == 'Backspace' && key.innerText == 'backspace') {
-                Keyboard.properties.value = Keyboard.properties.value.substring(0, Keyboard.properties.value.length - 1);
                 key.classList.add('active');
             } else if (e.key == 'Enter' && key.innerText == 'keyboard_return') {
                 key.classList.add('active');
-                Keyboard.properties.value += '\n';
             } else if (e.key == 'CapsLock' && key.innerText == 'keyboard_capslock') {
                 Keyboard.toggleCapsLock();
             } else if (e.key == ' ' && key.innerText == 'space_bar') {
                 key.classList.add('active');
-                Keyboard.properties.value += ' ';
             } else if (e.key == 'Shift' && key.innerText == 'Shift') {
                 Keyboard.toggleShift();
             }
@@ -448,6 +452,7 @@ const Keyboard = {
 
     keyOnUp(e) {
         let keys = document.querySelectorAll('.keyboard__key');
+        let input = document.querySelector('.use-keyboard-input');
 
         for (const key of keys) {
             if (e.key == key.innerHTML) {
@@ -464,6 +469,7 @@ const Keyboard = {
                 key.classList.remove('active');
             }
         }
+        Keyboard.properties.value = input.value;
     },
 
     changeLang() {
