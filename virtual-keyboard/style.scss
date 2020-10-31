@@ -8,9 +8,9 @@
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
     user-select: none;
     transition: bottom 0.4s;
-    // &--hidden {
-    //     bottom: -100%;
-    // }
+    &--hidden {
+        bottom: -100%;
+    }
     &__keys {
         display: flex;
         flex-direction: column;
