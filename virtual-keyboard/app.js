@@ -60,7 +60,8 @@ const Keyboard = {
         this.elements.keysContainer = document.createElement('div');
 
         // Setup main elements
-        this.elements.main.classList.add('keyboard', 'keyboard--hidden');
+        this.elements.main.classList.add('keyboard');
+        
         this.elements.keysContainer.classList.add('keyboard__keys');
         this.elements.keysContainer.appendChild(this._createKeys(keyLayout));
 
@@ -524,7 +525,6 @@ const Keyboard = {
 
 window.addEventListener('DOMContentLoaded', function () {
     Keyboard.init(Keyboard.keyLayoutEN);
-
     window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecognition();
 });
