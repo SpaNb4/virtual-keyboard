@@ -1,2 +1,3 @@
-# spanb4-JS2020Q3
-Private repository for @spanb4
+# Virtual-keyboard
+Task description: https://github.com/rolling-scopes-school/tasks/blob/master/tasks/ready-projects/virtual-keyboard.md <br>
+Deploy: https://spanb4-virtual-keyboard.netlify.app/
